@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>HWL - Multi Currency Pricing</title>
+    <title>Multi Currency Pricing</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= URL ?>/assets/css/style.css">
@@ -14,7 +14,7 @@
 </head>
 <body>
 <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">HWL - Multi Currency Prices</a>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Multi Currency Prices</a>
     <form action="<?= URL ?>/products.php" method="GET" class="w-100 mb-0">
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search by Product Title" name="s"
                aria-label="Search" value="<?= ( isset( $_GET['s'] ) ? $_GET['s'] : "" ) ?>">

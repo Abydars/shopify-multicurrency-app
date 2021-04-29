@@ -2,26 +2,18 @@
 require_once 'functions.php';
 
 $authenticated = ! empty( $_SESSION['token'] ) && ! empty( $_SESSION['store'] );
-$error         = "";
 
 if ( isset( $_POST['t'] ) ) {
 	$api_key  = $_POST['api_key'];
 	$store    = $_POST['store'];
 	$password = $_POST['password'];
 	$token    = base64_encode( "{$api_key}:{$password}" );
-	try {
-		list( $products, $headers ) = getProducts( $store, $token );
+	list( $products, $headers ) = getProducts( $store, $token );
 
+	if ( ! empty( $products ) ) {
 		$_SESSION['token'] = $token;
 		$_SESSION['store'] = $store;
 		$authenticated     = true;
-
-		updateSetting( 'store_name', $store );
-		updateSetting( 'token', $token );
-		updateSetting( 'api_key', $api_key );
-		updateSetting( 'password', $password );
-	} catch ( Exception $e ) {
-		$error = $e->getMessage();
 	}
 }
 
@@ -51,9 +43,6 @@ if ( $authenticated ) {
 <body class="text-center">
 <form method="POST" class="form-signin">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-	<?php if ( ! empty( $error ) ) : ?>
-        <div class="alert alert-danger"><?= $error ?></div>
-	<?php endif; ?>
     <div class="form-group">
         <input type="text" class="form-control" name="store" placeholder="Store Name"
                value="<?= ( ! empty( $_POST['store'] ) ? $_POST['store'] : "" ) ?>"/>

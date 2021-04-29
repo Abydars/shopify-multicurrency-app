@@ -14,14 +14,10 @@ if ( isset( $_POST['t'] ) ) {
 	updatePrices( $prices );
 }
 
-$url              = isset( $_GET['purl'] ) ? base64_decode( $_GET['purl'] ) : false;
-$links            = [];
-$table_currencies = getCurrencies( 1 );
-$default_currency = getSetting( 'default_currency' );
-//$table_currencies = array_filter( $currencies, function ( $c ) use ( &$default_currency ) {
-//	return strtolower( $c['currency'] ) != strtolower( $default_currency );
-//} );
-$search = isset( $_GET['s'] ) ? $_GET['s'] : false;
+$url        = isset( $_GET['purl'] ) ? base64_decode( $_GET['purl'] ) : false;
+$links      = [];
+$currencies = getCurrencies();
+$search     = isset( $_GET['s'] ) ? $_GET['s'] : false;
 
 list( $products, $header ) = getProducts( false, false, $url, $search );
 
@@ -35,11 +31,8 @@ if ( ! empty( $products ) ) {
 		return $product;
 	}, $products );
 }
-$header_links = [];
 
-if ( ! empty( $header['link'][0] ) ) {
-	$header_links = explode( ', ', $header['link'][0] );
-}
+$header_links = explode( ', ', $header['link'][0] );
 
 foreach ( $header_links as $link ) {
 	$parts     = explode( ';', $link );
@@ -79,22 +72,20 @@ foreach ( $header_links as $link ) {
             <thead>
             <tr>
                 <th align="left">Product/Variation</th>
-                <th>Rest World (<?= $default_currency ?>)</th>
-				<?php foreach ( $table_currencies as $currency ) { ?>
-                    <th><?= $currency['name'] ?> (<?= $currency['currency'] ?>)</th>
+                <th>USD</th>
+				<?php foreach ( $currencies as $currency ) { ?>
+                    <th><?= $currency ?></th>
 				<?php } ?>
             </tr>
             </thead>
 			<?php foreach ( $products as $product ) {
 				list( $variants, $variants_header ) = getProductVariants( $product['id'] );
-				$colspan = count( $table_currencies ) + 2;
+				$colspan = count( $currencies ) + 2;
 				?>
                 <tr class="<?= ( $product['is_duplicated'] ? 'bg-light duplicated' : '' ) ?>">
                     <th align="left" <?= ( ! $product['is_duplicated'] ? "colspan='{$colspan}'" : '' ) ?>><a
                                 target="_blank"
-                                href="<?= getStoreUrl() ?>/admin/products/<?= $product['id'] ?>"><?= $product['id'] . ' - ' . $product['title'] ?></a>
-                        - <a href="<?= getStoreUrl() ?>/products/<?= $product['handle'] ?>"
-                             target="_blank"><?= $product['handle'] ?></a>
+                                href="<?= getStoreUrl() ?>/products/<?= $product['handle'] ?>"><?= $product['id'] . ' - ' . $product['title'] ?></a>
                     </th>
 					<?php if ( $product['is_duplicated'] ) { ?>
                         <td class="text-center" style="vertical-align: middle"
@@ -117,30 +108,24 @@ foreach ( $header_links as $link ) {
                                        data-variant-id="<?= $variant['id'] ?>" readonly/>
                             </div>
                         </td>
-						<?php foreach ( $table_currencies as $currency ) { ?>
+						<?php foreach ( $currencies as $currency ) { ?>
                             <td align="center">
                                 <div class="form-group">
-                                    <input name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency['code'] ?>][price]"
+                                    <input name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency ?>][price]"
                                            type="number"
                                            placeholder="Price"
                                            step="any"
                                            class="form-control"
-                                           value="<?= getFacadePrice( $product['id'], $variant['id'], 'variant', $currency['code'] ) ?>"/>
+                                           value="<?= getFacadePrice( $product['id'], $variant['id'], 'variant', $currency ) ?>"/>
                                 </div>
                                 <div class="form-group">
-                                    <input name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency['code'] ?>][compare_at_price]"
+                                    <input name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency ?>][compare_at_price]"
                                            type="number"
                                            placeholder="Compare Price"
                                            step="any"
                                            class="form-control"
-                                           value="<?= getFacadeCompareAtPrice( $product['id'], $variant['id'], 'variant', $currency['code'] ) ?>"/>
+                                           value="<?= getFacadeCompareAtPrice( $product['id'], $variant['id'], 'variant', $currency ) ?>"/>
                                 </div>
-                                <input type="hidden"
-                                       name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency['code'] ?>][handle]"
-                                       value="<?= $product['handle'] ?>"/>
-                                <input type="hidden"
-                                       name="prices[<?= $product['id'] ?>][variant][<?= $variant['id'] ?>][<?= $currency['code'] ?>][sku]"
-                                       value="<?= sku( $variant['sku'] ) ?>"/>
                             </td>
 						<?php } ?>
                         </tr>
